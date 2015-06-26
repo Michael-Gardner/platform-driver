@@ -77,7 +77,7 @@ class HPCC(object):
 
         self.config = ConfigParser.ConfigParser()
         self.config.read(self.conf_file)
-
+        self.user = self.config.get('DEFAULT','user')
         self.log                    = self.config.get('DEFAULT','log') + '/hpcc_platform_' + \
                                       datetime.isoformat(datetime.today(),'.') + '.log'
 
@@ -192,7 +192,7 @@ class HPCC(object):
             print("%s" % str(ip))
 
     def setupRadSSH(self):
-        self.login                  = AuthManager(self.config.get('DEFAULT','user'),include_userkeys=True)
+        self.login                  = AuthManager(self.user,include_userkeys=True)
         self.console                = RadSSHConsole()
         self.connections            = [(x, None) for x in self.hosts]
         socket.setdefaulttimeout(10)
