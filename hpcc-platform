@@ -55,51 +55,165 @@ class HPCC(object):
     files
     '''
 
-    def __init__(self, component=None, save=False, force_stop=False, debug=False, verbose=False, list=False):
+    def __init__(self, ping=False, component=None, save=False, force_stop=False, debug=False, verbose=False,\
+                 conf_file="/etc/HPCCSystems/environment.conf", print_list=False):
         '''
         Constructor
         '''
 
-        # configuration file setup for reading
-        self.config = ConfigParser.ConfigParser()
-        self.config.read('/etc/HPCCSystems/environment.conf')
+        #self.config = ConfigParser.ConfigParser()
+        #self.config.read('/etc/HPCCSystems/environment.conf')
 
-        # options that are parsed in from the command line
         self.component              = component
         self.verbose                = verbose
-        self.list                   = list
+        self.print_list             = print_list
         self.save                   = save
         self.force_stop             = force_stop
         self.debug                  = debug
+        self.conf_file              = conf_file
 
-        self.login                  = AuthManager(self.config.get('DEFAULT','user'),include_userkeys=True)
-        self.log                    = self.config.get('DEFAULT','log') + '/hpcc_platform_' + \
-                                      datetime.isoformat(datetime.today(),'.') + '.log'
+        self.hosts                  = []
+        self.login                  = None
+        self.log                    = None
 
-        # build host list
-        if self.component:
-            cmd = "/opt/HPCCSystems/sbin/configgen -env " + self.config.get('DEFAULT', 'configs') + "/" + \
-                self.config.get('DEFAULT', 'environment') + " -c " + self.component + " -listall | " + \
-                "awk 'BEGIN { FS = \",\" } ; {print $3}' | sort | uniq"
-        else:
-            cmd = "/opt/HPCCSystems/sbin/configgen -env " + self.config.get('DEFAULT', 'configs') + "/" + \
-                self.config.get('DEFAULT', 'environment') + " -listall | " + \
-                "awk 'BEGIN { FS = \",\" } ; {print $3}' | sort | uniq"
+        self.config = ConfigParser.ConfigParser()
+        self.config.read(self.configuration_file)
+
+        #self.log                    = self.config.get('DEFAULT','log') + '/hpcc_platform_' + \
+        #                              datetime.isoformat(datetime.today(),'.') + '.log'
+
+    @property
+    def conf_file(self):
+        return self.__conf_file
+
+    @conf_file.setter
+    def conf_file(self,val):
         try:
+            self.__conf_file = str(val)
+        except ValueError as err:
+            print(str(err))
+
+
+    @property
+    def component(self):
+        return self.__component
+
+    @component.setter
+    def component(self,val):
+        try:
+            self.__component = str(val)
+        except ValueError as err:
+            print(str(err))
+
+    @property
+    def verbose(self):
+        return self.__verbose
+
+    @verbose.setter
+    def verbose(self,val):
+        try:
+            self.__verbose = bool(val)
+        except ValueError as err:
+            print(str(err))
+
+    @property
+    def print_list(self):
+        return self.__print_list
+
+    @print_list.setter
+    def print_list(self,val):
+        try:
+            self.__print_list = bool(val)
+        except ValueError as err:
+            print(str(err))
+
+    @property
+    def save(self):
+        return self.__save
+
+    @save.setter
+    def save(self,val):
+        try:
+            self.__save = bool(val)
+        except ValueError as err:
+            print(str(err))
+
+    @property
+    def force_stop(self):
+        return self.__force_stop
+
+    @force_stop.setter
+    def force_stop(self,val):
+        try:
+            self.__force_stop = bool(val)
+        except ValueError as err:
+            print(str(err))
+
+    @property
+    def debug(self):
+        return self.__debug
+
+    @debug.setter
+    def debug(self,val):
+        try:
+            self.__debug = bool(val)
+        except ValueError as err:
+            print(str(err))
+
+    @property
+    def ping(self):
+        return self.__ping
+
+    @ping.setter
+    def ping(self,val):
+        try:
+            self.__ping = bool(val)
+        except ValueError as err:
+            print(str(err))
+
+
+    def getHostList(self):
+        try:
+            if self.component:
+                cmd = "/opt/HPCCSystems/sbin/configgen -env " + self.config.get('DEFAULT', 'configs') + "/" + \
+                    self.config.get('DEFAULT', 'environment') + " -c " + self.component + " -listall | " + \
+                    "awk 'BEGIN { FS = \",\" } ; {print $3}' | sort | uniq"
+            else:
+                cmd = "/opt/HPCCSystems/sbin/configgen -env " + self.config.get('DEFAULT', 'configs') + "/" + \
+                    self.config.get('DEFAULT', 'environment') + " -listall | " + \
+                    "awk 'BEGIN { FS = \",\" } ; {print $3}' | sort | uniq"
             rc = subprocess.Popen(cmd,stdout=subprocess.PIPE,shell=True)
             stdout, stderr = rc.communicate()
             self.hosts = stdout.splitlines()
-        except OSError as e:
-            print("Could not build host list: %s" % e)
+        except OSError as err:
+            print("Could not build host list: %s" % err)
             exit(1)
 
         for ip in self.hosts:
             print("%s" % str(ip))
 
-        #self.console                = RadSSHConsole()
-        #self.connections            = [(x, None) for x in self.hosts]
+    def setupRadSSH(self):
+        self.login                  = AuthManager(self.config.get('DEFAULT','user'),include_userkeys=True)
+        self.console                = RadSSHConsole()
+        self.connections            = [(x, None) for x in self.hosts]
 
         #socket.setdefaulttimeout(10)
+    def start(self):
+        print("Starting")
+
+    def restart(self):
+        print("Restarting")
+
+    def stop(self):
+        print("Stopping")
+
+    def listall(self):
+        print("Listing")
+
+    def checkConnections(self):
+        print("Checking Connections")
+
+
 
 
 def usage():
@@ -110,21 +224,17 @@ def usage():
     print(" -f|--force          sigkill on components that fail to stop")
     print(" -v|--verbose        print all information to STDOUT")
     print(" -s|--save           save all output to file")
+    print(" -p|--ping           check connections to cluster nodes")
     print(" -?|--help           print help")
 
 if __name__ == '__main__':
 
-    save      = False
-    list      = False
-    debug     = False
-    force     = False
-    verbose   = False
-    component = None
+    platform = HPCC()
 
     try:
         opts, args = getopt.getopt(sys.argv[1:],":csfdlv",["help","save","force","debug","list","verbose"])
-    except getopt.GetoptError as e:
-        print(str(e))
+    except getopt.GetoptError as err:
+        print(str(err))
         usage()
         exit(1)
 
@@ -133,23 +243,23 @@ if __name__ == '__main__':
             usage()
             exit(0)
         elif arg in ("-s", "--save"):
-            save = True
+            platform.save(True)
         elif arg in ("-v", "--verbose"):
-            verbose = True
+            platform.verbose(True)
         elif arg in ("-f", "--force"):
-            force = True
+            platform.force_stop(True)
         elif arg in ("-d", "--debug"):
-            debug = True
+            platform.debug(True)
         elif arg in ("-l", "--list"):
-            list = True
+            platform.print_list(True)
         elif arg in ("-c", "--component"):
-            component = value
+            platform.component(str(value))
+        elif arg in ("-p", "--ping"):
+            platform.ping(True)
         else:
             print("Unknown Option: %s" % arg)
             usage()
             exit(1)
-
-    hpcc = HPCC(component=component,save=save,list=list,debug=debug,force_stop=force,verbose=verbose)
 
 
 
