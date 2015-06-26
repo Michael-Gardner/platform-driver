@@ -64,7 +64,7 @@ class HPCC(object):
         print(" -l|--list           list all components and their respective addresses")
         print(" -d|--debug          debug logging level")
         print(" -f|--force          sigkill on components that fail to stop")
-        print(" -v|--verbose        print all information to STDOUT"
+        print(" -v|--verbose        print all information to STDOUT")
         print(" -?|--help           print help")
 
 if __name__ == '__main__':
