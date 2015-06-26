@@ -93,8 +93,8 @@ class HPCC(object):
             print("Could not build host list: %s" % e)
             exit(1)
 
-        for i in len(self.hosts):
-            print("%s" % self.hosts[i])
+        for ip in self.hosts:
+            print("%s" % str(ip))
 
         #self.console                = RadSSHConsole()
         #self.connections            = [(x, None) for x in self.hosts]
