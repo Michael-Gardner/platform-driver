@@ -199,7 +199,6 @@ class HPCC(object):
 
 
     def start(self):
-        print("Starting")
         self.setupRadSSH()
         self.cluster = Cluster(self.connections, self.login, console=self.console)
         self.cluster.run_command('hostname')
