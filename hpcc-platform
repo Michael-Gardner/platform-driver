@@ -30,6 +30,7 @@ import logging
 import subprocess
 import getopt
 import sys
+import pwd
 
 from radssh.ssh import Cluster
 from radssh.console import RadSSHConsole
@@ -250,6 +251,9 @@ def usage():
     print(" -?|--help           print help")
 
 if __name__ == '__main__':
+
+    uid = pwd.getpwnam('hpcc')[2]
+    os.setuid(uid)
 
     platform = HPCC()
 
