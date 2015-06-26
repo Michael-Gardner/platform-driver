@@ -149,7 +149,7 @@ if __name__ == '__main__':
             usage()
             exit(1)
 
-    hpcc = HPCC(component=component,save=save,list=list,debug=debug,force=force,verbose=verbose)
+    hpcc = HPCC(component=component,save=save,list=list,debug=debug,force_stop=force,verbose=verbose)
 
 
 
