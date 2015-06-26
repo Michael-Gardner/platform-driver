@@ -278,6 +278,8 @@ if __name__ == '__main__':
             usage()
             exit(1)
 
+    platform.start()
+
 
 
 
