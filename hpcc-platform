@@ -203,7 +203,9 @@ class HPCC(object):
         self.setupRadSSH()
         self.cluster = Cluster(self.connections, self.login, console=self.console)
         self.cluster.run_command('hostname')
-        self.print_output()
+        for host, job in self.cluster.last_result.items():
+            if job.completed and job.result.return_code == 0:
+                print("%s" % job.result.stdout)
 
     def print_output(self):
         '''
