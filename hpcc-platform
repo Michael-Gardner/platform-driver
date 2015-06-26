@@ -30,12 +30,12 @@ from radssh.console import RadSSHConsole
 from radssh.authmgr import AuthManager
 import radssh.config
 
-def signal_handler(signal, frame):
-    if signal == signal.SIGINT:
+def signal_handler(signo, frame):
+    if signo == signal.SIGINT:
         print('\033[0m\nhpcc-run.py interrupted')
     else:
         print('\033[0m\nExiting hpcc-run.py')
-    os._exit(int(signal))
+    os._exit(int(signo))
 
 signal.signal(signal.SIGINT,  signal_handler)
 signal.signal(signal.SIGQUIT, signal_handler)
