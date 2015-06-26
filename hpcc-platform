@@ -61,9 +61,6 @@ class HPCC(object):
         Constructor
         '''
 
-        #self.config = ConfigParser.ConfigParser()
-        #self.config.read('/etc/HPCCSystems/environment.conf')
-
         self.component              = component
         self.verbose                = verbose
         self.print_list             = print_list
@@ -74,13 +71,12 @@ class HPCC(object):
 
         self.hosts                  = []
         self.login                  = None
-        self.log                    = None
 
         self.config = ConfigParser.ConfigParser()
-        self.config.read(self.configuration_file)
+        self.config.read(self.conf_file)
 
-        #self.log                    = self.config.get('DEFAULT','log') + '/hpcc_platform_' + \
-        #                              datetime.isoformat(datetime.today(),'.') + '.log'
+        self.log                    = self.config.get('DEFAULT','log') + '/hpcc_platform_' + \
+                                      datetime.isoformat(datetime.today(),'.') + '.log'
 
     @property
     def conf_file(self):
@@ -196,10 +192,27 @@ class HPCC(object):
         self.login                  = AuthManager(self.config.get('DEFAULT','user'),include_userkeys=True)
         self.console                = RadSSHConsole()
         self.connections            = [(x, None) for x in self.hosts]
+        socket.setdefaulttimeout(10)
 
-        #socket.setdefaulttimeout(10)
+
     def start(self):
         print("Starting")
+        self.cluster = Cluster(self.connections, self.login, console=self.console)
+        self.cluster.run_command('hostname')
+        self.print_output()
+
+    def print_output(self):
+        '''
+        print_output formats output from all command types
+        :return: None
+        '''
+        for host, job in self.cluster.last_result.items():
+            if job.completed and job.result.return_code == 0:
+                print(job.result.stdout)
+            else:
+                print("%s   %s" % (host, self.cluster.connections[host]))
+                print("%s   %s   %s" % (job, job.result.status, job.result.stderr))
+
 
     def restart(self):
         print("Restarting")
@@ -208,7 +221,11 @@ class HPCC(object):
         print("Stopping")
 
     def listall(self):
-        print("Listing")
+        try:
+
+        except OSError as err:
+            print(str(err))
+            exit(1)
 
     def checkConnections(self):
         print("Checking Connections")
