@@ -28,6 +28,8 @@ import ConfigParser
 from datetime import datetime
 import logging
 import subprocess
+import getopt
+import sys
 
 from radssh.ssh import Cluster
 from radssh.console import RadSSHConsole
@@ -53,7 +55,7 @@ class HPCC(object):
     files
     '''
 
-    def __init__(self, component=None, save=False, force_stop=False, debug=False):
+    def __init__(self, component=None, save=False, force_stop=False, debug=False, verbose=False, list=False):
         '''
         Constructor
         '''
@@ -64,6 +66,8 @@ class HPCC(object):
 
         # options that are parsed in from the command line
         self.component              = component
+        self.verbose                = verbose
+        self.list                   = list
         self.save                   = save
         self.force_stop             = force_stop
         self.debug                  = debug
@@ -89,22 +93,65 @@ class HPCC(object):
             print("Could not build host list: %s" % e)
             exit(1)
 
-        self.console                = RadSSHConsole()
-        self.connections            = [(x, None) for x in self.hosts]
+        for i in len(self.hosts):
+            print("%s" % self.hosts[i])
 
-        socket.setdefaulttimeout(10)
+        #self.console                = RadSSHConsole()
+        #self.connections            = [(x, None) for x in self.hosts]
+
+        #socket.setdefaulttimeout(10)
 
 
-
-    def usage(self):
-        print("Usage:  hpcc-platform [option(s)]\n")
-        print(" -c|--component      -c <component_name>")
-        print(" -l|--list           list all components and their respective addresses")
-        print(" -d|--debug          debug logging level")
-        print(" -f|--force          sigkill on components that fail to stop")
-        print(" -v|--verbose        print all information to STDOUT")
-        print(" -?|--help           print help")
+def usage():
+    print("Usage:  hpcc-platform [option(s)]\n")
+    print(" -c|--component      -c <component_name>")
+    print(" -l|--list           list all components and their respective addresses")
+    print(" -d|--debug          debug logging level")
+    print(" -f|--force          sigkill on components that fail to stop")
+    print(" -v|--verbose        print all information to STDOUT")
+    print(" -s|--save           save all output to file")
+    print(" -?|--help           print help")
 
 if __name__ == '__main__':
-    while True:
-        time.sleep(1)
+
+save        = False
+list        = False
+debug       = False
+force       = False
+verbose     = False
+component   = None
+
+try:
+    opts, args = getopt.getopt(sys.argv[1:],":csfdlv",["help","save","force","debug","list","verbose"])
+except getopt.GetoptError as e:
+    print(str(e))
+    usage()
+    exit(1)
+
+for arg, value in opts:
+    if arg in ("-?", "--help"):
+        usage()
+        exit(0)
+    elif arg in ("-s", "--save"):
+        save = True
+    elif arg in ("-v", "--verbose"):
+        verbose = True
+    elif arg in ("-f", "--force"):
+        force = True
+    elif arg in ("-d", "--debug"):
+        debug = True
+    elif arg in ("-l", "--list"):
+        list = True
+    elif arg in ("-c", "--component"):
+        component = value
+    else:
+        print("Unknown Option: %s" % arg)
+        usage()
+        exit(1)
+
+hpcc = HPCC(component=component,save=save,list=list,debug=debug,force=force,verbose=verbose)
+
+
+
+
+
