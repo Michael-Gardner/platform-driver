@@ -23,7 +23,11 @@ from __future__ import print_function
 import os
 import signal
 import time
+import socket
+import ConfigParser
+from datetime import datetime
 import logging
+import subprocess
 
 from radssh.ssh import Cluster
 from radssh.console import RadSSHConsole
@@ -49,15 +53,48 @@ class HPCC(object):
     files
     '''
 
-    def __init__(self):
+    def __init__(self, component=None, save=False, force_stop=False, debug=False):
         '''
         Constructor
         '''
-        self.environment_directory  = "/etc/HPCCSystems"
-        self.component              = None
-        self.save                   = False
-        self.force_stop             = False
-        self.debug                  = False
+
+        # configuration file setup for reading
+        self.config = ConfigParser.ConfigParser()
+        self.config.read('/etc/HPCCSystems/environment.conf')
+
+        # options that are parsed in from the command line
+        self.component              = component
+        self.save                   = save
+        self.force_stop             = force_stop
+        self.debug                  = debug
+
+        self.login                  = AuthManager(self.config.get('DEFAULT','user'),include_userkeys=True)
+        self.log                    = self.config.get('DEFAULT','log') + '/hpcc_platform_' + \
+                                      datetime.isoformat(datetime.today(),'.') + '.log'
+
+        # build host list
+        if self.component:
+            cmd = "/opt/HPCCSystems/sbin/configgen -env " + self.config.get('DEFAULT', 'configs') + "/" + \
+                self.config.get('DEFAULT', 'environment') + " -c " + self.component + " -listall | " + \
+                "awk 'BEGIN { FS = \",\" } ; {print $3}' | sort | uniq"
+        else:
+            cmd = "/opt/HPCCSystems/sbin/configgen -env " + self.config.get('DEFAULT', 'configs') + "/" + \
+                self.config.get('DEFAULT', 'environment') + " -listall | " + \
+                "awk 'BEGIN { FS = \",\" } ; {print $3}' | sort | uniq"
+        try:
+            rc = subprocess.Popen(cmd,stdout=PIPE,shell=True)
+            stdout, stderr = rc.communicate()
+            self.hosts = stdout.splitlines()
+        except OSError as e:
+            print("Could not build host list: %s" % e)
+            exit(1)
+
+        self.console                = RadSSHConsole()
+        self.connections            = [(x, None) for x in self.hosts]
+
+        socket.setdefaulttimeout(10)
+
+
 
     def usage(self):
         print("Usage:  hpcc-platform [option(s)]\n")
