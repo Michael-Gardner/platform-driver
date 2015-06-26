@@ -114,42 +114,42 @@ def usage():
 
 if __name__ == '__main__':
 
-save        = False
-list        = False
-debug       = False
-force       = False
-verbose     = False
-component   = None
+    save      = False
+    list      = False
+    debug     = False
+    force     = False
+    verbose   = False
+    component = None
 
-try:
-    opts, args = getopt.getopt(sys.argv[1:],":csfdlv",["help","save","force","debug","list","verbose"])
-except getopt.GetoptError as e:
-    print(str(e))
-    usage()
-    exit(1)
-
-for arg, value in opts:
-    if arg in ("-?", "--help"):
-        usage()
-        exit(0)
-    elif arg in ("-s", "--save"):
-        save = True
-    elif arg in ("-v", "--verbose"):
-        verbose = True
-    elif arg in ("-f", "--force"):
-        force = True
-    elif arg in ("-d", "--debug"):
-        debug = True
-    elif arg in ("-l", "--list"):
-        list = True
-    elif arg in ("-c", "--component"):
-        component = value
-    else:
-        print("Unknown Option: %s" % arg)
+    try:
+        opts, args = getopt.getopt(sys.argv[1:],":csfdlv",["help","save","force","debug","list","verbose"])
+    except getopt.GetoptError as e:
+        print(str(e))
         usage()
         exit(1)
 
-hpcc = HPCC(component=component,save=save,list=list,debug=debug,force=force,verbose=verbose)
+    for arg, value in opts:
+        if arg in ("-?", "--help"):
+            usage()
+            exit(0)
+        elif arg in ("-s", "--save"):
+            save = True
+        elif arg in ("-v", "--verbose"):
+            verbose = True
+        elif arg in ("-f", "--force"):
+            force = True
+        elif arg in ("-d", "--debug"):
+            debug = True
+        elif arg in ("-l", "--list"):
+            list = True
+        elif arg in ("-c", "--component"):
+            component = value
+        else:
+            print("Unknown Option: %s" % arg)
+            usage()
+            exit(1)
+
+    hpcc = HPCC(component=component,save=save,list=list,debug=debug,force=force,verbose=verbose)
 
 
 
