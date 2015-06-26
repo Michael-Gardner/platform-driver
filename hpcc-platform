@@ -86,7 +86,7 @@ class HPCC(object):
                 self.config.get('DEFAULT', 'environment') + " -listall | " + \
                 "awk 'BEGIN { FS = \",\" } ; {print $3}' | sort | uniq"
         try:
-            rc = subprocess.Popen(cmd,stdout=PIPE,shell=True)
+            rc = subprocess.Popen(cmd,stdout=subprocess.PIPE,shell=True)
             stdout, stderr = rc.communicate()
             self.hosts = stdout.splitlines()
         except OSError as e:
