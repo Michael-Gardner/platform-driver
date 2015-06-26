@@ -18,12 +18,12 @@
 #############################################################################
 '''
 
+from __future__ import print_function
+
 import os
 import signal
 import time
 import logging
-
-from __future__ import print_function
 
 from radssh.ssh import Cluster
 from radssh.console import RadSSHConsole
