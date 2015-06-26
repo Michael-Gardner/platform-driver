@@ -20,6 +20,7 @@
 
 import os
 import signal
+import time
 import logging
 
 from __future__ import print_function
@@ -67,3 +68,5 @@ class HPCC(object):
         print(" -?|--help           print help")
 
 if __name__ == '__main__':
+    while True:
+        time.sleep(1)
