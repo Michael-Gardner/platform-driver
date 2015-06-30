@@ -32,6 +32,8 @@ import getopt
 import sys
 import pwd
 
+from utils.connection import Connection
+
 from radssh.ssh import Cluster
 from radssh.console import RadSSHConsole
 from radssh.authmgr import AuthManager
@@ -61,136 +63,53 @@ class HPCC(object):
         '''
         Constructor
         '''
-
-        self.component              = component
-        self.verbose                = verbose
-        self.print_list             = print_list
-        self.save                   = save
-        self.force_stop             = force_stop
-        self.debug                  = debug
-        self.conf_file              = conf_file
-
-        self.hosts                  = []
-        self.login                  = None
-        self.console                = None
-        self.connections            = None
-        self.cluster                = None
-
-        self.config = ConfigParser.ConfigParser()
-        self.config.read(self.conf_file)
-        self.user = self.config.get('DEFAULT','user')
-        self.log                    = self.config.get('DEFAULT','log') + '/hpcc_platform_' + \
-                                      datetime.isoformat(datetime.today(),'.') + '.log'
+        self.directories    = {}
+        self.components     = []
+        self.hosts          = []
+        self.connection     = None
+        # connection object
 
     @property
-    def conf_file(self):
-        return self.__conf_file
+    def directories(self):
+        '''
+        :return: dictionary
+        '''
+        return self.__directories
 
-    @conf_file.setter
-    def conf_file(self,val):
+    @directories.setter
+    def directories(self,key,val):
         try:
-            self.__conf_file = str(val)
-        except ValueError as err:
-            print(str(err))
-
-
-    @property
-    def component(self):
-        return self.__component
-
-    @component.setter
-    def component(self,val):
-        try:
-            self.__component = str(val)
+            self.__directories[str(key)] = str(val)
         except ValueError as err:
             print(str(err))
 
     @property
-    def verbose(self):
-        return self.__verbose
+    def components(self):
+        '''
+        :return: list
+        '''
+        return self.__components
 
-    @verbose.setter
-    def verbose(self,val):
+    @components.setter
+    def components(self,val):
         try:
-            self.__verbose = bool(val)
+            self.__components.append(str(val))
         except ValueError as err:
             print(str(err))
 
     @property
-    def print_list(self):
-        return self.__print_list
+    def hosts(self):
+        '''
+        :return: list
+        '''
+        return self.__hosts
 
-    @print_list.setter
-    def print_list(self,val):
+    @hosts.setter
+    def hosts(self,val):
         try:
-            self.__print_list = bool(val)
+            self.__hosts.append(str(val))
         except ValueError as err:
             print(str(err))
-
-    @property
-    def save(self):
-        return self.__save
-
-    @save.setter
-    def save(self,val):
-        try:
-            self.__save = bool(val)
-        except ValueError as err:
-            print(str(err))
-
-    @property
-    def force_stop(self):
-        return self.__force_stop
-
-    @force_stop.setter
-    def force_stop(self,val):
-        try:
-            self.__force_stop = bool(val)
-        except ValueError as err:
-            print(str(err))
-
-    @property
-    def debug(self):
-        return self.__debug
-
-    @debug.setter
-    def debug(self,val):
-        try:
-            self.__debug = bool(val)
-        except ValueError as err:
-            print(str(err))
-
-    @property
-    def ping(self):
-        return self.__ping
-
-    @ping.setter
-    def ping(self,val):
-        try:
-            self.__ping = bool(val)
-        except ValueError as err:
-            print(str(err))
-
-
-    def getHostList(self):
-        try:
-            if self.component:
-                cmd = "/opt/HPCCSystems/sbin/configgen -env " + self.config.get('DEFAULT', 'configs') + "/" + \
-                    self.config.get('DEFAULT', 'environment') + " -c " + self.component + " -listall | " + \
-                    "awk 'BEGIN { FS = \",\" } ; {print $3}' | sort | uniq"
-            else:
-                cmd = "/opt/HPCCSystems/sbin/configgen -env " + self.config.get('DEFAULT', 'configs') + "/" + \
-                    self.config.get('DEFAULT', 'environment') + " -listall | " + \
-                    "awk 'BEGIN { FS = \",\" } ; {print $3}' | sort | uniq"
-            rc = subprocess.Popen(cmd,stdout=subprocess.PIPE,shell=True)
-            stdout, stderr = rc.communicate()
-            self.hosts = stdout.splitlines()
-        except OSError as err:
-            print("Could not build host list: %s" % err)
-            exit(1)
-
-        for ip in self.hosts:
-            print("%s" % str(ip))
 
     def setupRadSSH(self):
         self.login                  = AuthManager(self.user,include_userkeys=True)
