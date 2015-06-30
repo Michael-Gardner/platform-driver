@@ -29,6 +29,10 @@ class Connection(object):
     '''
 
     def __init__(self,hosts):
+        """
+        constructor
+        :type hosts: list
+        """
         self.hosts = hosts
 
     @property

@@ -52,8 +52,7 @@ class HPCC(object):
     files
     '''
 
-    def __init__(self, ping=False, component=None, save=False, force_stop=False, debug=False, verbose=False,\
-                 conf_file="/etc/HPCCSystems/environment.conf", print_list=False):
+    def __init__(self):
         '''
         Constructor
         '''
@@ -69,6 +68,12 @@ class HPCC(object):
         :return: dictionary
         '''
         return self.__directories
+
+    def __getDirectory(self,key):
+        if key not in self.__directories.keys():
+            raise KeyError
+        return self.__directories[key]
+        
 
     @directories.setter
     def directories(self,key,val):
