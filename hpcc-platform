@@ -29,10 +29,6 @@ import getopt
 import sys
 import pwd
 
-from utils.connection import Connection
-
-
-
 def signal_handler(signo, frame):
     if signo == signal.SIGINT:
         print('\033[0m\nhpcc-run.py interrupted')
@@ -43,119 +39,6 @@ def signal_handler(signo, frame):
 signal.signal(signal.SIGINT,  signal_handler)
 signal.signal(signal.SIGQUIT, signal_handler)
 signal.signal(signal.SIGTERM, signal_handler)
-
-
-class HPCC(object):
-    '''
-    This class implements the logic necessary for driving the HPCC Platform
-    and it's specified components within the environment.xml and configuration
-    files
-    '''
-
-    def __init__(self):
-        '''
-        Constructor
-        '''
-        self.directories    = {}
-        self.components     = []
-        self.hosts          = []
-        self.connection     = Connection(self.hosts)
-        # connection object
-
-    @property
-    def directories(self):
-        '''
-        :return: dictionary
-        '''
-        return self.__directories
-
-    def __getDirectory(self,key):
-        if key not in self.__directories.keys():
-            raise KeyError
-        return self.__directories[key]
-        
-
-    @directories.setter
-    def directories(self,key,val):
-        try:
-            self.__directories[str(key)] = str(val)
-        except ValueError as err:
-            print(str(err))
-
-    @property
-    def components(self):
-        '''
-        :return: list
-        '''
-        return self.__components
-
-    @components.setter
-    def components(self,val):
-        try:
-            self.__components.append(str(val))
-        except ValueError as err:
-            print(str(err))
-
-    @property
-    def hosts(self):
-        '''
-        :return: list
-        '''
-        return self.__hosts
-
-    @hosts.setter
-    def hosts(self,val):
-        try:
-            self.__hosts.append(str(val))
-        except ValueError as err:
-            print(str(err))
-
-    def setupRadSSH(self):
-        self.login                  = AuthManager(self.user,include_userkeys=True)
-        self.console                = RadSSHConsole()
-        self.connections            = [(x, None) for x in self.hosts]
-        socket.setdefaulttimeout(10)
-
-
-    def start(self):
-        self.setupRadSSH()
-        self.cluster = Cluster(self.connections, self.login, console=self.console)
-        self.cluster.run_command('hostname')
-        for host, job in self.cluster.last_result.items():
-            if job.completed and job.result.return_code == 0:
-                print("%s" % job.result.stdout)
-
-    def print_output(self):
-        '''
-        print_output formats output from all command types
-        :return: None
-        '''
-        for host, job in self.cluster.last_result.items():
-            if job.completed and job.result.return_code == 0:
-                print(job.result.stdout)
-            else:
-                print("%s   %s" % (host, self.cluster.connections[host]))
-                print("%s   %s   %s" % (job, job.result.status, job.result.stderr))
-
-
-    def restart(self):
-        print("Restarting")
-
-    def stop(self):
-        print("Stopping")
-
-    def listall(self):
-        try:
-            print("Listall")
-        except OSError as err:
-            print(str(err))
-            exit(1)
-
-    def checkConnections(self):
-        print("Checking Connections")
-
-
-
 
 def usage():
     print("Usage:  hpcc-platform [option(s)]\n")

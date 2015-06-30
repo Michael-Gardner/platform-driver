@@ -33,17 +33,8 @@ class Connection(object):
         constructor
         :type hosts: list
         """
-        self.hosts = hosts
+        self.__hosts = hosts
 
-    @property
-    def hosts(self):
-        return.__hosts
 
-    @hosts.setter
-    def hosts(self,value):
-        try:
-            self.__hosts.append(str(value))
-        except ValueError as err:
-            print(str(err))
 
 __author__ = 'michael gardner'
