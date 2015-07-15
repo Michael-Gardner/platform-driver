@@ -31,7 +31,7 @@ class Platform(object):
         '''
         Constructor
         '''
-        logging.getLogger('Platform').addHandler(logging.NullHandler())
+        self.logger = logging.getLogger(__name__)
         self.directories    = {}
         self.components     = []
         self.hosts          = []
@@ -48,7 +48,7 @@ class Platform(object):
 
 
     def start(self):
-        logging.info("yeah")
+        self.logger.info("I started!")
 #        self.setupRadSSH()
  #       self.cluster = Cluster(self.connections, self.login, console=self.console)
   #      self.cluster.run_command('hostname')
