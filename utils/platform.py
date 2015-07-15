@@ -16,6 +16,7 @@
     limitations under the License.
 #############################################################################
 '''
+import logging
 
 from utils.connection import Connection
 
@@ -46,13 +47,13 @@ class Platform(object):
 
 
     def start(self):
+        logging.info("yeah")
 #        self.setupRadSSH()
  #       self.cluster = Cluster(self.connections, self.login, console=self.console)
   #      self.cluster.run_command('hostname')
    #     for host, job in self.cluster.last_result.items():
     #        if job.completed and job.result.return_code == 0:
      #           print("%s" % job.result.stdout)
-        logging.info("heya")
 
     def print_output(self):
         '''
