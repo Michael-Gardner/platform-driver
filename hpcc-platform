@@ -57,7 +57,7 @@ if __name__ == '__main__':
     uid = pwd.getpwnam('hpcc')[2]
     os.setuid(uid)
 
-    platform = HPCC()
+    platform = Platform()
 
     try:
         opts, args = getopt.getopt(sys.argv[1:],":csfdlv",["help","save","force","debug","list","verbose"])
