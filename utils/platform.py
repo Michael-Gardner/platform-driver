@@ -33,7 +33,7 @@ class Platform(object):
         self.directories    = {}
         self.components     = []
         self.hosts          = []
-        self.connection     = Connection(self.hosts)
+#        self.connection     = Connection(self.hosts)
         # connection object
 
 
@@ -46,12 +46,13 @@ class Platform(object):
 
 
     def start(self):
-        self.setupRadSSH()
-        self.cluster = Cluster(self.connections, self.login, console=self.console)
-        self.cluster.run_command('hostname')
-        for host, job in self.cluster.last_result.items():
-            if job.completed and job.result.return_code == 0:
-                print("%s" % job.result.stdout)
+#        self.setupRadSSH()
+ #       self.cluster = Cluster(self.connections, self.login, console=self.console)
+  #      self.cluster.run_command('hostname')
+   #     for host, job in self.cluster.last_result.items():
+    #        if job.completed and job.result.return_code == 0:
+     #           print("%s" % job.result.stdout)
+        logging.info("heya")
 
     def print_output(self):
         '''

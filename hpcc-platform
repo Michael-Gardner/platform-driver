@@ -22,18 +22,15 @@ from __future__ import print_function
 
 import os
 import signal
-import time
-import socket
-import ConfigParser
 import getopt
 import sys
 import pwd
+import logging
 
 def signal_handler(signo, frame):
     if signo == signal.SIGINT:
-        print('\033[0m\nhpcc-run.py interrupted')
-    else:
-        print('\033[0m\nExiting hpcc-run.py')
+        logging.info("SIGINT caught")
+    logging.info("Exiting")
     os._exit(int(signo))
 
 signal.signal(signal.SIGINT,  signal_handler)
@@ -53,6 +50,10 @@ def usage():
 
 if __name__ == '__main__':
 
+    logname = "hpcc-platform.log"
+    logging.basicConfig(filename=logname,level=logging.INFO)
+    logging.info("starting hpcc-platform driver")
+
     uid = pwd.getpwnam('hpcc')[2]
     os.setuid(uid)
 
@@ -71,20 +72,28 @@ if __name__ == '__main__':
             exit(0)
         elif arg in ("-s", "--save"):
             platform.save(True)
+            logging.debug("platform.save(True)")
         elif arg in ("-v", "--verbose"):
             platform.verbose(True)
+            logging.debug("platform.verbose(True)")
         elif arg in ("-f", "--force"):
             platform.force_stop(True)
+            logging.debug("platform.force_stop(True)")
         elif arg in ("-d", "--debug"):
-            platform.debug(True)
+            logging.setLevel(logging.DEBUG)
+            logging.debug("logger.setLevel(logging.DEBUG)")
         elif arg in ("-l", "--list"):
             platform.print_list(True)
+            logging.debug("platform.print_list(True)")
         elif arg in ("-c", "--component"):
             platform.component(str(value))
+            logging.debug("platform.component(%s)", str(value))
         elif arg in ("-p", "--ping"):
             platform.ping(True)
+            logging.debug("platform.ping(True)")
         else:
             print("Unknown Option: %s" % arg)
+            logging.debug("Unknown Option: %s", arg)
             usage()
             exit(1)
 
