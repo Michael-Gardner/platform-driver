@@ -35,55 +35,21 @@ class Platform(object):
         self.directories    = {}
         self.components     = []
         self.hosts          = []
-#        self.connection     = Connection(self.hosts)
-        # connection object
 
+    def list(self,value=None):
+        self.logger.info("I listed!")
 
+    def show(self,value=None):
+        self.logger.info("I showed!")
 
-    def setupRadSSH(self):
-        self.login                  = AuthManager(self.user,include_userkeys=True)
-        self.console                = RadSSHConsole()
-        self.connections            = [(x, None) for x in self.hosts]
-        socket.setdefaulttimeout(10)
-
-
-    def start(self):
+    def start(self,value=None):
         self.logger.info("I started!")
-#        self.setupRadSSH()
- #       self.cluster = Cluster(self.connections, self.login, console=self.console)
-  #      self.cluster.run_command('hostname')
-   #     for host, job in self.cluster.last_result.items():
-    #        if job.completed and job.result.return_code == 0:
-     #           print("%s" % job.result.stdout)
 
-    def print_output(self):
-        '''
-        print_output formats output from all command types
-        :return: None
-        '''
-        for host, job in self.cluster.last_result.items():
-            if job.completed and job.result.return_code == 0:
-                print(job.result.stdout)
-            else:
-                print("%s   %s" % (host, self.cluster.connections[host]))
-                print("%s   %s   %s" % (job, job.result.status, job.result.stderr))
+    def stop(self,value=None):
+        self.logger.info("I stopped!")
 
+    def restart(self,value=None):
+        self.logger.info("I restarted!")
 
-    def restart(self):
-        print("Restarting")
-
-    def stop(self):
-        print("Stopping")
-
-    def listall(self):
-        try:
-            print("Listall")
-        except OSError as err:
-            print(str(err))
-            exit(1)
-
-    def checkConnections(self):
-        print("Checking Connections")
-
-
-__author__ = 'adhok'
+    def status(self,value=None):
+        self.logger.info("I statused!")
