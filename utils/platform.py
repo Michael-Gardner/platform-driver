@@ -43,6 +43,7 @@ class Platform(object):
         self.logger.info("I showed!")
 
     def start(self,value=None):
+        print "oogabooga"
         self.logger.info("I started!")
 
     def stop(self,value=None):
