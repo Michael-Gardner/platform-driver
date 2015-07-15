@@ -31,6 +31,7 @@ class Platform(object):
         '''
         Constructor
         '''
+        logging.getLogger('Platform').addHandler(logging.NullHandler())
         self.directories    = {}
         self.components     = []
         self.hosts          = []
