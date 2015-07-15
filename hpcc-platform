@@ -22,7 +22,6 @@ from __future__ import print_function
 
 import os
 import signal
-import getopt
 import sys
 import pwd
 import logging
@@ -67,42 +66,33 @@ if __name__ == '__main__':
 
     platform = Platform()
 
-    try:
-        opts, args = getopt.getopt(sys.argv[1:],"",["help","list","show","start","stop","restart","status"])
-    except getopt.GetoptError as err:
-        logger.error(str(err))
+    # argument parsing for the driver
+    # valid options: "help","list","show","start","stop","restart","status"
+    command = sys.argv[1]
+    optional_arguments = sys.argv[2:]
+
+    if command == "help":
+        usage()
+    elif command  == "list":
+        platform.list(optional_arguments)
+    elif command == "show":
+        platform.show(optional_arguments)
+    elif command == "start":
+        logger.info("starting")
+        platform.start(optional_arguments)
+    elif command == "stop":
+        platform.stop(optional_arguments)
+    elif command == "restart":
+        platform.restart(optional_arguments)
+    elif command == "status":
+        platform.status(optional_arguments)
+    else:
+        print("Unknown Option: %s" % arg)
+        logger.debug("Unknown Option: %s", arg)
         usage()
         exit(1)
 
-    for arg, value in opts:
-        if arg in ("-?", "help"):
-            usage()
-            exit(0)
-        elif arg in ("list"):
-            platform.list(value)
-            exit(0)
-        elif arg in ("show"):
-            platform.show(value)
-            exit(0)
-        elif arg in ("start"):
-            logger.info("starting")
-            platform.start(value)
-            exit(0)
-        elif arg in ("stop"):
-            platform.stop(value)
-            exit(0)
-        elif arg in ("restart"):
-            platform.restart(value)
-            exit(0)
-        elif arg in ("status"):
-            platform.status(value)
-            exit(0)
-        else:
-            print("Unknown Option: %s" % arg)
-            logger.debug("Unknown Option: %s", arg)
-            usage()
-            exit(1)
-
+    exit(0)
 
 
 
