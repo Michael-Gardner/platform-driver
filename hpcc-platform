@@ -41,21 +41,24 @@ signal.signal(signal.SIGTERM, signal_handler)
 
 def usage():
     print("Usage:  hpcc-platform [option(s)]\n")
-    print(" -c|--component      -c <component_name>")
-    print(" -l|--list           list all components and their respective addresses")
-    print(" -d|--debug          debug logging level")
+    print(" list-components           list all components and their respective addresses")
     print(" -f|--force          sigkill on components that fail to stop")
-    print(" -v|--verbose        print all information to STDOUT")
-    print(" -s|--save           save all output to file")
+    print(" -v|--verbose        print logging information to STDOUT")
     print(" -p|--ping           check connections to cluster nodes")
     print(" -?|--help           print help")
 
 if __name__ == '__main__':
 
+    # setup logging
     logname = "hpcc-platform.log"
     logging.basicConfig(filename=logname,level=logging.INFO)
     logger = logging.getLogger(__name__)
+    dh = logging.FileHandler(logname + ".debug")
+    dh.setLevel(logging.DEBUG)
+    logger.addHandler(dh)
+
     logger.info("starting hpcc-platform driver")
+    logger.debug("debugging working")
 
     uid = pwd.getpwnam('hpcc')[2]
     os.setuid(uid)
@@ -63,9 +66,9 @@ if __name__ == '__main__':
     platform = Platform()
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:],":csfdlv",["help","save","force","debug","list","verbose"])
+        opts, args = getopt.getopt(sys.argv[1:],":csv",["help","list","verbose"])
     except getopt.GetoptError as err:
-        print(str(err))
+        logger.error(str(err))
         usage()
         exit(1)
 
@@ -73,34 +76,24 @@ if __name__ == '__main__':
         if arg in ("-?", "--help"):
             usage()
             exit(0)
-        elif arg in ("-s", "--save"):
-            platform.save(True)
-            logger.debug("platform.save(True)")
         elif arg in ("-v", "--verbose"):
-            platform.verbose(True)
-            logger.debug("platform.verbose(True)")
-        elif arg in ("-f", "--force"):
-            platform.force_stop(True)
-            logger.debug("platform.force_stop(True)")
+            ch = logging.StreamHandler()
+            ch.setLevel(logging.INFO)
+            cf = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+            ch.setFormatter(cf)
+            logger.addHandler(ch)
         elif arg in ("-d", "--debug"):
             logging.setLevel(logging.DEBUG)
-            logger.debug("logger.setLevel(logging.DEBUG)")
-        elif arg in ("-l", "--list"):
+        elif arg in ("list"):
             platform.print_list(True)
-            logger.debug("platform.print_list(True)")
-        elif arg in ("-c", "--component"):
-            platform.component(str(value))
-            logger.debug("platform.component(%s)", str(value))
         elif arg in ("-p", "--ping"):
             platform.ping(True)
-            logger.debug("platform.ping(True)")
         else:
             print("Unknown Option: %s" % arg)
             logger.debug("Unknown Option: %s", arg)
             usage()
             exit(1)
 
-    platform.start()
 
 
 
