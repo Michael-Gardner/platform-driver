@@ -27,6 +27,8 @@ import sys
 import pwd
 import logging
 
+from utils.platform import Platform
+
 def signal_handler(signo, frame):
     if signo == signal.SIGINT:
         logging.info("SIGINT caught")
