@@ -31,26 +31,26 @@ class Platform(object):
         '''
         Constructor
         '''
-        self.logger = logging.getLogger(__name__)
+        logging.info('Platform.__init__(self)')
         self.directories    = {}
         self.components     = []
         self.hosts          = []
 
     def list(self,value=None):
-        self.logger.info("I listed!")
+        logging.info("I listed!")
 
     def show(self,value=None):
-        self.logger.info("I showed!")
+        logging.info("I showed!")
 
     def start(self,value=None):
         print "oogabooga"
-        self.logger.info("I started!")
+        logging.info("I started!")
 
     def stop(self,value=None):
-        self.logger.info("I stopped!")
+        logging.info("I stopped!")
 
     def restart(self,value=None):
-        self.logger.info("I restarted!")
+        logging.info("I restarted!")
 
     def status(self,value=None):
-        self.logger.info("I statused!")
+        logging.info("I statused!")
