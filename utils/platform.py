@@ -38,6 +38,8 @@ class Platform(object):
 
     def list(self,value=None):
         logging.info("I listed!")
+        logging.info("passed %s", str(value))
+
 
     def show(self,value=None):
         logging.info("I showed!")
