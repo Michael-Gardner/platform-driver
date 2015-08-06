@@ -20,7 +20,12 @@
 <p>This repository is for developing an alternate driver for the
 HPCC-Platform that is based on python instead of bash scripts</p>
 
-
+<ul>
+    <li>validation of environment.xml on host node</li>
+    <li>diff of all machines environment.xml to insure consistency across environment</li>
+    <li>stopall</li>
+    <li>selective pssh or radSSH driver</li>
+</ul>
 <h3>Library</h3>
 
 - hpcc
